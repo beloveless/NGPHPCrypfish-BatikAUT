@@ -15,7 +15,7 @@ services:
     ports:
       - "8090:8090"
     depends_on:
-      - docker-apache
+      - blowfish-apache
     networks:
       - my-network
 

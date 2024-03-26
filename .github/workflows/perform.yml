@@ -91,14 +91,14 @@ jobs:
         run: |
           curl -L http://${{ env.URL }}/cek_koneksi.php
       
-      - name: Context Setup
-        # env:
-        #     # Set a previously defined secret as an environment variable for this step:
-        #     AUTURL: ${{secrets.B64PASSWORD}}
-        # Replace the "AUTURL" string in the context file with the real base64-encoded password:
-        run: |
-          sed -ie "s/AUTURL/${{ env.URL }}/" badcrud.context
-          cat badcrud.context
+      # - name: Context Setup
+      #   # env:
+      #   #     # Set a previously defined secret as an environment variable for this step:
+      #   #     AUTURL: ${{secrets.B64PASSWORD}}
+      #   # Replace the "AUTURL" string in the context file with the real base64-encoded password:
+      #   run: |
+      #     sed -ie "s/AUTURL/${{ env.URL }}/" badcrud.context
+      #     cat badcrud.context
           
       - name: ZAP Scan
         uses: hermanka/action-full-scan@master
@@ -108,7 +108,7 @@ jobs:
       #     # Additional command line options
       #     # -j   runs the AJAX spider
       #     # -U   specifies which user to select from the context file
-          cmd_options: -U "admin" -n badcrud.context
+      #     cmd_options: -U "admin" -n badcrud.context
           
       - name: stop docker
         run: docker stop blowfish-apache

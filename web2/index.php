@@ -1,85 +1,175 @@
-<?php
-include "functions.php";
-session_start();
-if (!isset($_SESSION['user'])) {
-    header("location: login.php");
-} else {
-    $pdo = pdo_connect();
-    $stmt = $pdo->prepare('SELECT * FROM contacts');
-    $stmt->execute();
-    $contacts = $stmt->fetchAll(PDO::FETCH_ASSOC);
+<?php include("header.php"); 
 ?>
-    <!DOCTYPE html>
-    <html lang="en">
 
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta http-equiv="X-UA-Compatible" content="ie=edge">
-        <?= style_script() ?>
-        <script>
-            $(document).ready(function() {
-                $('#employee').DataTable();
-            });
-        </script>
+<!doctype html>
+<html lang="en">
+  <head>
+</head>
+  <body>
+        <!-- HERO JUMBOTRON -->
+        <section class="hero">
+            <div class="title container">
+            <h1>WELCOME TO <br>
+                <span>STORE BATIK TULIS</span> 
+            </h1>
+            <p>Batik Tulis Tradisional Khas Bakaran <br>
+                Jl. Juwana - Tayu Km 02 <br>
+                Desa Bakaran Kulon RT 01/RW 03 <br>
+                Juwana - Pati - Jawa Tengah
+          </p>
+            <a href="#product-section"><button type="button" class="btn btn-primary">BUY NOW</button></a>
+            
+        </div>
+        </section>
 
-        <title>Dashboard</title>
-    </head>
 
-    <body>
-        <div class="container">
-            <h2>Halo, <?= $_SESSION['user'];?></h2>
-            <?php include "menu.php"; ?>
-            <div class="row">
-                <div class="col">
-                    <table class="table table-striped" id="employee">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Title</th>
-                                <th>Created</th>
-                                <th></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($contacts as $contact) : ?>
-                                <tr>
-                                    <td><?= $contact['id'] ?></td>
-                                    <td><?= $contact['name'] ?></td>
-                                    <td><?= $contact['email'] ?></td>
-                                    <td><?= $contact['phone'] ?></td>
-                                    <td><?= $contact['title'] ?></td>
-                                    <td><?= $contact['created'] ?></td>
-                                    <td class="actions">
-                                        <a type="button" class="btn btn-sm btn-outline btn-success" href="update.php?id=<?= $contact['id'] ?>" class="edit">edit</a>
-                                        <a type="button" class="btn btn-sm btn-outline btn-danger" href="delete.php?id=<?= $contact['id'] ?>" class="trash" onclick="return confirm('Are you sure you want to delete this item?');">delete</a>
-                                    </td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                        <tfoot>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Title</th>
-                                <th>Created</th>
-                                <th></th>
-                            </tr>
-                        </tfoot>
-                    </table>
+        <!-- PRODUK -->
+<!-- <?php print_r($_SESSION['cart'])?> -->
+        <section id="product-section">
+
+        
+        <div class="produk m-5">
+          <div class="judul m-5">
+            <h2 class="text-center">~ ETALASE PRODUCT ~</h2>
+          </div>
+          <div class="row row-cols-1 row-cols-md-3 g-4">
+
+            <div class="col">
+              <form action="manage_cart.php" method="POST">
+              <div class="card">
+                <img src="Batik Ladrang Klasik.jpg" class="card-img-top" alt="...">
+                <!-- <div class="card-img-overlay">
+                  <h5 class="card-title btn btn-primary btn btn-danger">45%</h5>
+                </div> -->
+                <div class="card-body text-center">
+                  <h5 class="card-title">IDR 155.000</h5>
+                  <p class="card-text">Kain Batik Motif Ladrang Klasik</p>
+                  <button type="submit" name="Add_To_Cart" class="btn btn-info">Tambah Keranjang</button>
+                  <input type="hidden" name="Item_Name" value="Kain Batik Motif Ladrang Klasik">
+                  <input type="hidden" name="Price" value="155000">
                 </div>
+              </div>
+              </form>
             </div>
-        </div>
 
-        <div class="text-center">
-            <p class="mt-5 mb-3 text-muted">hk &copy; 2023</p>
-        </div>
-    </body>
+            <div class="col">
+              <form action="manage_cart.php" method="POST">
+              <div class="card">
+                <img src="Sarung Motif Pagi Sore Udang Kipas Warna.jpg" class="card-img-top" alt="...">
+                <div class="card-body text-center">
+                  <h5 class="card-title">IDR 160.000</h5>
+                  <p class="card-text">Sarung Motif Pagi Sore Udang Kipas</p>
+                  <button type="submit" name="Add_To_Cart" class="btn btn-info">Tambah Keranjang</button>
+                  <input type="hidden" name="Item_Name" value="Sarung Motif Pagi Sore Udang Kipas">
+                  <input type="hidden" name="Price" value="160000">
+                </div>
+              </div>
+              </form>
+            </div>
 
-    </html>
-<?php } ?>
+            <div class="col">
+            <form action="manage_cart.php" method="POST">
+              <div class="card">
+                <img src="Batik Parikesit Classik.jpg" class="card-img-top" alt="...">
+                <div class="card-body text-center">
+                  <h5 class="card-title">IDR 145.000</h5>
+                  <p class="card-text">Batik Motif Parikesit Klasik</p>
+                  <button type="submit" name="Add_To_Cart" class="btn btn-info">Tambah Keranjang</button>
+                  <input type="hidden" name="Item_Name" value="Batik Motif Parikesit Klasik">
+                  <input type="hidden" name="Price" value="145000">
+                </div>
+              </div>
+              </form>
+            </div>
+
+            <div class="col">
+            <form action="manage_cart.php" method="POST">
+              <div class="card">
+                <img src="Batik Ladrang Kawung Classik Warna.jpg" class="card-img-top" alt="...">
+                <div class="card-body text-center">
+                  <h5 class="card-title">IDR 150.000</h5>
+                  <p class="card-text">Batik Motif Ladrang Kawung Klasik</p>
+                  <button type="submit" name="Add_To_Cart" class="btn btn-info">Tambah Keranjang</button>
+                  <input type="hidden" name="Item_Name" value="Batik Motif Ladrang Kawung Klasik">
+                  <input type="hidden" name="Price" value="150000">
+                </div>
+              </div>
+              </form>
+            </div>
+
+            <div class="col">
+            <form action="manage_cart.php" method="POST">
+              <div class="card">
+                <img src="Sarung Motif Pagi Sore.jpg" class="card-img-top" alt="...">
+                <div class="card-body text-center">
+                  <h5 class="card-title">IDR 118.000</h5>
+                  <p class="card-text">Sarung Motif Pagi Sore</p>
+                  <button type="submit" name="Add_To_Cart" class="btn btn-info">Tambah Keranjang</button>
+                  <input type="hidden" name="Item_Name" value="Sarung Motif Pagi Sore">
+                  <input type="hidden" name="Price" value="118000">
+                </div>
+              </div>
+              </form>
+            </div>
+
+            <div class="col">
+            <form action="manage_cart.php" method="POST">
+              <div class="card">
+                <img src="Batik Wil Kapal Pecah Colet Warna.jpg" class="card-img-top" alt="...">
+                <div class="card-body text-center">
+                  <h5 class="card-title">IDR 150.000</h5>
+                  <p class="card-text">Batik Wil Kapal Pecah Colet Warna</p>
+                  <button type="submit" name="Add_To_Cart" class="btn btn-info">Tambah Keranjang</button>
+                  <input type="hidden" name="Item_Name" value="Batik Wil Kapal Pecah Colet Warna">
+                  <input type="hidden" name="Price" value="150000">
+                </div>
+              </div>
+              </form>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <section id="contact-section">
+
+      </section>
+
+        <footer class="bg-primary text-center">
+          <div class="row p-4">
+            <div class="col text-start">
+              <h5>STORE BATIK TULIS</h5>
+            </div>
+
+            <div class="col">
+              <h3>HUBUNGI KAMI :</h3>
+            </div>
+
+              <div class="col text-start">
+            <div class="col">
+              <div class="sosmeditem">
+                <a class="text-dark" href="https://wa.me/+6289603336000"><i class="fa-brands fa-whatsapp"></i> 089603336000</a>
+              </div>
+            </div>
+            <div class="col">
+              <div class="sosmeditem">
+                <a class="text-dark" href=""><i class="fa-brands fa-facebook"></i> Lala Batik Bakaran</a>
+              </div>
+            </div>
+            <div class="col">
+              <div class="sosmeditem">
+                <a class="text-dark" href=""><i class="fa-brands fa-instagram"></i> Lala Batik Bakaran</a>
+              </div>
+            </div>
+          </div>
+          </div>
+
+          <div class="row text-center">
+            <p>Copyright BATIKKU @2023</p>
+          </div>
+        </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha2/dist/js/bootstrap.bundle.min.js" integrity="sha384-qKXV1j0HvMUeCBQ+QVp7JcfGl760yU08IQ+GpUo5hlbpg51QRiuqHAJz8+BrxE/N" crossorigin="anonymous"></script>
+  </body>
+</html>

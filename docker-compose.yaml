@@ -5,18 +5,20 @@ services:
     container_name: blowfish-apache
     ports:
       - "80:80"
-    links:
-      - mysql-db
+    networks:
+      - my-network
 
-  mysql-db:
-    image: mysql:5.6
-    container_name: blowfish-mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: badcrud
-      # MYSQL_USER: db_user
-      # MYSQL_PASSWORD: password
+  zap:
+    image: owasp/zap2docker-weekly
+    container_name: zap-container
+    command: ["zap.sh", "-daemon", "-port", "8090", "-host", "0.0.0.0", "-config", "api.disablekey=true", "-ajaxSpider", "-scan", "-recursive", "-spider", "1", "-url", "http://docker-apache/index.php"]
     ports:
-      - "3306:3306"
-    volumes:
-      - ./db/badcrud.sql:/docker-entrypoint-initdb.d/badcrud.sql:ro
+      - "8090:8090"
+    depends_on:
+      - docker-apache
+    networks:
+      - my-network
+
+networks:
+  my-network:
+    driver: bridge

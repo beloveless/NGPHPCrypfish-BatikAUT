@@ -78,7 +78,8 @@ jobs:
         run: |
           docker exec blowfish-apache ls -la /var/www/html/
           docker exec blowfish-apache cat /var/www/html/index.php
-          docker exec blowfish-apache php /var/www/html/cek_koneksi.php
+      #   docker exec blowfish-apache php /var/www/html/cek_koneksi.php
+      
       # - name: Check inside MySQL container
       #   run: |
       #     docker exec docker-mysql mysql -uroot -ppassword -hlocalhost

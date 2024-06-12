@@ -1,4 +1,4 @@
-name: Performance Testing
+name: Performance Test using Selenium
 
 on:
   push:
@@ -9,24 +9,14 @@ jobs:
   build-image:
     name: Build Images
     runs-on: ubuntu-latest
-    outputs:
-      start_time: ${{ steps.set_start_time.outputs.start_time }}
-      build_duration: ${{ steps.build-image-duration.outputs.duration }}
-    steps:
-      - name: Set Start Time
-        id: set_start_time
-        run: echo "start_time=$(date +%s)" >> $GITHUB_ENV
 
+    steps:
       - name: Checkout Repository
         uses: actions/checkout@v4 
 
       - name: Build PHPCrypfish Image
         run: |
-          start_time=$(date +%s)
           docker build -t phpcrypfish:latest .
-          end_time=$(date +%s)
-          duration=$((end_time - start_time))
-          echo "build_duration=$duration" >> $GITHUB_ENV
 
       - name: Save PHPCrypfish Image to Artifact
         run: docker save -o /tmp/phpcrypfish.tar phpcrypfish:latest
@@ -41,8 +31,6 @@ jobs:
     name: Dynamic Analysis
     needs: build-image
     runs-on: ubuntu-latest
-    outputs:
-      duration: ${{ steps.dynamic-analysis-duration.outputs.duration }}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -91,61 +79,39 @@ jobs:
       - name: Check AUT URL
         run: |
           curl -L http://${{ env.URL }}/cek_koneksi.php
-      
-      # - name: Context Setup
-      #   # env:
-      #   #     # Set a previously defined secret as an environment variable for this step:
-      #   #     AUTURL: ${{secrets.B64PASSWORD}}
-      #   # Replace the "AUTURL" string in the context file with the real base64-encoded password:
-      #   run: |
-      #     sed -ie "s/AUTURL/${{ env.URL }}/" badcrud.context
-      #     cat badcrud.context
           
-      - name: ZAP Scan
-        uses: hermanka/action-full-scan@master
-        with:
-          target: http://${{ env.URL }}
-          network_name: isolated
-      #     # Additional command line options
-      #     # -j   runs the AJAX spider
-      #     # -U   specifies which user to select from the context file
-      #     cmd_options: -U "admin" -n badcrud.context
+      - name: Check Server Availability
+        run: |
+          if ! nc -zv ${{ env.URL }} 80; then
+            echo "Server is not available."
+            exit 1
+          fi
+      
+      - name: Selenium Preparation
+        run: docker run --network=isolated -d -p 4444:4444 -p 7900:7900 -v /dev/shm:/dev/shm --name firefox-standalone selenium/standalone-firefox:latest
+
+      - name: Wait for Selenium Hub
+        run: |
+          until curl --output /dev/null --silent --head --fail http://localhost:4444; do
+            echo "waiting for selenium hub to be started"
+            sleep 1
+          done      
+
+      - name: Check the Hub
+        run: curl http://localhost:4444/ui
+
+      - name: Install Selenium client
+        run: pip install -U selenium pytest pytest-xdist
+
+      - name: Run Python tests
+        env:
+          AUT_URL: ${{ env.AUT_URL }}
+        run: |
+          pytest -v tests/
           
       - name: stop docker
         run: docker stop blowfish-apache
 
-      - name: Measure Page Load Time
-        run: |
-          start_time=$(date +%s)
-          # Your existing steps for measuring page load time here...
-          end_time=$(date +%s)
-          zap_duration=$((end_time - start_time))
-          echo "duration=${zap_duration}" >> $GITHUB_OUTPUT
-
-      - name: Calculate Duration
-        run: |
-          start_time=${{ needs.build-image.outputs.start_time }}
-          end_time=$(date +%s)
-          build_duration=${{ needs.build-image.outputs.build_duration }}
-          dynamic_analysis_duration=${{ needs.dast.outputs.duration }}
-          zap_duration=${{ env.zap_duration }}
-          total_duration=$((build_duration + dynamic_analysis_duration + zap_duration))
-          echo "total_duration=${total_duration}" >> $GITHUB_ENV
-
-  performance-test:
-    name: Performance Test
-    needs: [build-image, dast]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Calculate End-Users's Duration
-        run: |
-          start_time=${{ needs.build-image.outputs.start_time }}
-          end_time=$(date +%s)
-          duration=$((end_time - start_time))
-          minutes=$((duration / 60))
-          seconds=$((duration % 60))
-          echo "Total process by end-user's perspective took $duration seconds."
-          echo "Or, more precisely, $minutes minute(s) and $seconds second(s)."
 
   sast:
     name: SonarCloud
